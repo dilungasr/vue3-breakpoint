@@ -14,11 +14,11 @@ const opts = {
   maxH: [1000],
 };
 
-const { min, mid, mode, max, xminH, minH, midH, modeH, maxH } = opts;
+
 
 // sizeWacher for checking the size the viewport
 function isMin() {
-  const mql = window.matchMedia(`(max-width: ${min[0]}px)`);
+  const mql = window.matchMedia(`(max-width: ${opts.min[0]}px)`);
 
   //mutate the min size
   vuex.store.commit("$br/MIN", mql.matches);
@@ -26,7 +26,7 @@ function isMin() {
 
 function isMid() {
   const mql = window.matchMedia(
-    `(min-width: ${mid[0]}px) and (max-width: ${mid[1]}px)`
+    `(min-width: ${opts.mid[0]}px) and (max-width: ${opts.mid[1]}px)`
   );
 
   //mutate the min size
@@ -34,28 +34,28 @@ function isMid() {
 }
 function isMode() {
   const mql = window.matchMedia(
-    `(min-width: ${mode[0]}px) and (max-width: ${mode[1]}px)`
+    `(min-width: ${opts.mode[0]}px) and (max-width: ${opts.mode[1]}px)`
   );
 
   //mutate the min size
   vuex.store.commit("$br/MODE", mql.matches);
 }
 function isMax() {
-  const mql = window.matchMedia(`(min-width: ${max[0]}px)`);
+  const mql = window.matchMedia(`(min-width: ${opts.max[0]}px)`);
 
   //mutate the min size
   vuex.store.commit("$br/MAX", mql.matches);
 }
 
 function isXMinH() {
-  const mql = window.matchMedia(`(max-height: ${xminH[0]}px)`);
+  const mql = window.matchMedia(`(max-height: ${opts.xminH[0]}px)`);
 
   //mutate the minH size
   vuex.store.commit("$br/XMIN_H", mql.matches);
 }
 function isMinH() {
   const mql = window.matchMedia(
-    `(min-height: ${minH[0]}px) and (max-height: ${minH[1]}px)`
+    `(min-height: ${opts.minH[0]}px) and (max-height: ${opts.minH[1]}px)`
   );
 
   //mutate the minH size
@@ -63,7 +63,7 @@ function isMinH() {
 }
 function isMidH() {
   const mql = window.matchMedia(
-    `(min-height: ${midH[0]}px) and (max-height: ${midH[1]}px)`
+    `(min-height: ${opts.midH[0]}px) and (max-height: ${opts.midH[1]}px)`
   );
 
   //mutate the minH size
@@ -72,7 +72,7 @@ function isMidH() {
 
 function isModeH() {
   const mql = window.matchMedia(
-    `(min-height: ${modeH[0]}px) and (max-height: ${modeH[1]}px)`
+    `(min-height: ${opts.modeH[0]}px) and (max-height: ${opts.modeH[1]}px)`
   );
 
   //mutate the minH size
@@ -80,7 +80,7 @@ function isModeH() {
 }
 
 function isMaxH() {
-  const mql = window.matchMedia(`(min-height: ${maxH[0]}px)`);
+  const mql = window.matchMedia(`(min-height: ${opts.maxH[0]}px)`);
 
   //mutate the minH size
   vuex.store.commit("$br/MAX_H", mql.matches);
@@ -137,7 +137,7 @@ export default (options = opts) => {
 
     store.registerModule("$br", module);
 
-    // start the sizeWatcher 
+    // start the sizeWatcher
     sizeWatcher();
   };
 };
