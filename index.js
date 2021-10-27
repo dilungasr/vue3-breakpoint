@@ -106,17 +106,20 @@ export function sizeWatcher() {
 }
 
 // Vue plugin for configuring breakpoints and accessing vuex store
-export default ({
-  min = [699],
-  mid = [700, 1023],
-  mode = [1024, 1299],
-  max = [1300],
-  xminH = [49],
-  minH = [500, 699],
-  midH = [700, 849],
-  modeH = [850, 999],
-  maxH = [, 1000],
-}) => {
+export default (options = opts) => {
+  const {
+    min = [699],
+    mid = [700, 1023],
+    mode = [1024, 1299],
+    max = [1300],
+    xminH = [49],
+    minH = [500, 699],
+    midH = [700, 849],
+    modeH = [850, 999],
+    maxH = [, 1000],
+  } = options;
+
+  // set the configuration to the options object
   opts.min = min;
   opts.mid = mid;
   opts.mode = mode;
