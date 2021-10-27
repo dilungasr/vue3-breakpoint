@@ -101,7 +101,8 @@ function caller() {
 
 // sizeWatcher the watchman for the breakpoints
 export function sizeWatcher() {
-  window.onload = caller;
+  // test the media query just after instantiating the store
+  caller();
   window.onresize = caller;
 }
 
@@ -136,7 +137,7 @@ export default (options = opts) => {
 
     store.registerModule("$br", module);
 
-    // start the sizeWatcher
+    // start the sizeWatcher 
     sizeWatcher();
   };
 };
