@@ -16,9 +16,6 @@ const opts = {
   maxH: [1000],
 };
 
-// mediaQueryHandlers stores the function that tests the defined media queries
-const mediaQueryHandlers = [];
-
 // caller calls all all the media query watcher functions to test the media query (Call Of Duty)
 function caller() {
   for (let i = mediaQueryHandlers.length; i--; ) {
@@ -33,6 +30,9 @@ export function sizeWatcher() {
   // test media query onresize
   window.onresize = caller;
 }
+
+// mediaQueryHandlers stores the function that tests the defined media queries
+const mediaQueryHandlers = [];
 
 // Vue plugin for configuring breakpoints and accessing vuex store
 export default (options = opts) => {
@@ -51,6 +51,11 @@ export default (options = opts) => {
   for (let i = allOpts.length; i--; ) {
     const key = allOpts[i][0];
     const val = allOpts[i][1];
+
+    // check if value is of array type
+    if (!Array.isArray(val)) {
+      throw new Error(`breakpoint ${key} should be of array type`);
+    }
 
     //add configuration to the module state with an initial state
     module.state[key] = false;
@@ -85,7 +90,13 @@ export default (options = opts) => {
 
     // only lower bound defined
     else if (boundCount === 1) {
-      mqlStr = `(min-${measure}: ${val[0]}px)`;
+      if (typeof val[0] === "number") {
+        mqlStr = `(min-${measure}: ${val[0]}px)`;
+      }
+      //invalid value
+      else {
+        throw new Error(`breakpoint '${key}' has one or more invalid value`);
+      }
     }
 
     // invalid syntaxy
