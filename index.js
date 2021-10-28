@@ -9,7 +9,7 @@ const opts = {
   mid: [700, 1023],
   mode: [1024, 1299],
   max: [1300],
-  xminH: [49],
+  xminH: [499],
   minH: [500, 699],
   midH: [700, 849],
   modeH: [850, 999],
