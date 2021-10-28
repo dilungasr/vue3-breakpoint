@@ -1,6 +1,6 @@
 {
   "name": "vue3-breakpoint",
-  "version": "1.0.70",
+  "version": "1.1.67",
   "description": "Tiny package for creating breakpoints in your vue 3 application's viewport and test them as boolean values",
   "main": "index.js",
   "repository": {
