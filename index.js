@@ -112,7 +112,6 @@ export default (options = opts) => {
 
       // fire the mutation to update breakpoint
       vuex.store.commit(`$br/${key.toUpperCase()}`, mql.matches);
-      console.log(mqlStr);
     };
     // add media query watcher handler
     mediaQueryHandlers.push(mediaQueryHandler);
@@ -121,7 +120,6 @@ export default (options = opts) => {
   // CREATE VUEX PLUGIN TO ACCESS THE STORE AS SOON AS THE STORE INITIALIZED
   return (store) => {
     vuex.store = store;
-    console.log(store);
 
     store.registerModule("$br", module);
 
