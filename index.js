@@ -5,7 +5,7 @@ const vuex = { store: null };
 
 // default breakpoints
 const opts = {
-  min: [699],
+  min: [, 699],
   mid: [700, 1023],
   mode: [1024, 1299],
   max: [1300],
