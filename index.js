@@ -2,6 +2,8 @@ import { module } from "./vuex";
 
 //  interfacing package to the vuex store
 const vuex = { store: null };
+
+// default breakpoints
 const opts = {
   min: [699],
   mid: [700, 1023],
@@ -14,126 +16,101 @@ const opts = {
   maxH: [1000],
 };
 
+// mediaQueryHandlers stores the function that tests the defined media queries
+const mediaQueryHandlers = [];
 
-
-// sizeWacher for checking the size the viewport
-function isMin() {
-  const mql = window.matchMedia(`(max-width: ${opts.min[0]}px)`);
-
-  //mutate the min size
-  vuex.store.commit("$br/MIN", mql.matches);
-}
-
-function isMid() {
-  const mql = window.matchMedia(
-    `(min-width: ${opts.mid[0]}px) and (max-width: ${opts.mid[1]}px)`
-  );
-
-  //mutate the min size
-  vuex.store.commit("$br/MID", mql.matches);
-}
-function isMode() {
-  const mql = window.matchMedia(
-    `(min-width: ${opts.mode[0]}px) and (max-width: ${opts.mode[1]}px)`
-  );
-
-  //mutate the min size
-  vuex.store.commit("$br/MODE", mql.matches);
-}
-function isMax() {
-  const mql = window.matchMedia(`(min-width: ${opts.max[0]}px)`);
-
-  //mutate the min size
-  vuex.store.commit("$br/MAX", mql.matches);
-}
-
-function isXMinH() {
-  const mql = window.matchMedia(`(max-height: ${opts.xminH[0]}px)`);
-
-  //mutate the minH size
-  vuex.store.commit("$br/XMIN_H", mql.matches);
-}
-function isMinH() {
-  const mql = window.matchMedia(
-    `(min-height: ${opts.minH[0]}px) and (max-height: ${opts.minH[1]}px)`
-  );
-
-  //mutate the minH size
-  vuex.store.commit("$br/MIN_H", mql.matches);
-}
-function isMidH() {
-  const mql = window.matchMedia(
-    `(min-height: ${opts.midH[0]}px) and (max-height: ${opts.midH[1]}px)`
-  );
-
-  //mutate the minH size
-  vuex.store.commit("$br/MID_H", mql.matches);
-}
-
-function isModeH() {
-  const mql = window.matchMedia(
-    `(min-height: ${opts.modeH[0]}px) and (max-height: ${opts.modeH[1]}px)`
-  );
-
-  //mutate the minH size
-  vuex.store.commit("$br/MODE_H", mql.matches);
-}
-
-function isMaxH() {
-  const mql = window.matchMedia(`(min-height: ${opts.maxH[0]}px)`);
-
-  //mutate the minH size
-  vuex.store.commit("$br/MAX_H", mql.matches);
-}
-
-// caller calls all tthe utility functions to continuosly check the media query
+// caller calls all all the media query watcher functions to test the media query (Call Of Duty)
 function caller() {
-  isMin();
-  isMid();
-  isMode();
-  isMax();
-  isMinH();
-  isXMinH();
-  isMidH();
-  isModeH();
-  isMaxH();
+  for (let i = mediaQueryHandlers.length; i--; ) {
+    mediaQueryHandlers[i]();
+  }
 }
 
 // sizeWatcher the watchman for the breakpoints
 export function sizeWatcher() {
   // test the media query just after instantiating the store
   caller();
+  // test media query onresize
   window.onresize = caller;
 }
 
 // Vue plugin for configuring breakpoints and accessing vuex store
 export default (options = opts) => {
-  const {
-    min = [699],
-    mid = [700, 1023],
-    mode = [1024, 1299],
-    max = [1300],
-    xminH = [49],
-    minH = [500, 699],
-    midH = [700, 849],
-    modeH = [850, 999],
-    maxH = [, 1000],
-  } = options;
+  //update configurations
+  const configuredOpts = Object.entries(options);
+  for (let i = configuredOpts.length; i--; ) {
+    const key = configuredOpts[i][0];
+    const val = configuredOpts[i][1];
 
-  // set the configuration to the options object
-  opts.min = min;
-  opts.mid = mid;
-  opts.mode = mode;
-  opts.max = max;
-  opts.xminH = xminH;
-  opts.minH = minH;
-  opts.midH = midH;
-  opts.modeH = modeH;
-  opts.maxH = maxH;
+    // update the opts configurations
+    opts[key] = val;
+  }
 
-  // return a vuex plugin
+  // create store, updators and media query watchers for each configuration
+  const allOpts = Object.entries(opts);
+  for (let i = allOpts.length; i--; ) {
+    const key = allOpts[i][0];
+    const val = allOpts[i][1];
+
+    //add configuration to the module state with an initial state
+    module.state[key] = false;
+
+    // add mutation for updating the configuration
+    module.mutations[`${key.toUpperCase()}`] = (state, payload) => {
+      state[key] = payload;
+    };
+
+    // INTERPRET VALUES TO CREATE MEDIA QUERY STRING
+    const measure = key.charAt(key.length - 1) === "H" ? "height" : "width";
+
+    //   media query string
+    let mqlStr = "";
+    const boundCount = val.length;
+
+    // both upper and lower bound defined
+    if (boundCount === 2) {
+      // if only upper boud is defined undefined(for max only)
+      if (typeof val[0] === "undefined" && typeof val[1] === "number") {
+        mqlStr = `(max-${measure}: ${val[1]}px)`;
+      }
+      //if both upper and lower bound defined
+      else if (typeof val[0] === "number" && typeof val[1] === "number") {
+        mqlStr = `(min-${measure}: ${val[0]}px) and (max-${measure}: ${val[1]}px)`;
+      }
+      //invalid value
+      else {
+        throw new Error(`breakpoint '${key}' has one or more invalid value `);
+      }
+    }
+
+    // only lower bound defined
+    else if (boundCount === 1) {
+      mqlStr = `(min-${measure}: ${val[0]}px)`;
+    }
+
+    // invalid syntaxy
+    else {
+      throw new Error(
+        `breakpoint ${key} should only have  1 or 2 values and not less or more`
+      );
+    }
+
+    // CREATE MEDIA QUERY HANDLER FUNCTION
+    const mediaQueryHandler = () => {
+      const mql = window.matchMedia(mqlStr);
+
+      // fire the mutation to update breakpoint
+      vuex.store.commit(`$br/${key.toUpperCase()}`, mql.matches);
+      console.log(mqlStr);
+    };
+    // add media query watcher handler
+    mediaQueryHandlers.push(mediaQueryHandler);
+  }
+
+  // CREATE VUEX PLUGIN TO ACCESS THE STORE AS SOON AS THE STORE INITIALIZED
   return (store) => {
     vuex.store = store;
+    console.log(store);
 
     store.registerModule("$br", module);
 
